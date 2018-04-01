@@ -1,0 +1,22 @@
+Taxas de acerto: 
+k = 1	0.710843373494
+k = 2	0.710843373494
+k = 3	0.726907630522
+k = 5	0.730923694779
+k = 7	0.759036144578
+k = 9	0.763052208835
+k = 11	0.763052208835
+k = 13	0.763052208835
+k = 15	0.763052208835
+Tempo de Treinamento: 0 segundos
+Tempo de teste individual:
+k = 1	t = 0.591860210207 segundos
+k = 2	t = 0.599172539273 segundos
+k = 3	t = 0.603472412092 segundos
+k = 5	t = 0.594181336893 segundos
+k = 7	t = 0.590690204714 segundos
+k = 9	t = 0.590270234321 segundos
+k = 11	t = 0.590367529515 segundos
+k = 13	t = 0.592758856531 segundos
+k = 15	t = 0.593257237818 segundos
+Tempo total de teste: 5.34603056136 segundos
