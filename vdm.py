@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from distancias import distancias
+from value_difference_metric import value_difference_metric
 
 class vdm(object):
     
@@ -23,11 +23,6 @@ class vdm(object):
         self.pesos = pesos
         
         self.result = self.calculate_matriz_vdm()
-        for matriz in self.result:
-            print '\nMatriz:'
-            for linha in matriz:
-                print linha
-
         return self.result
 
     def converter(self, resultado):
@@ -65,7 +60,8 @@ class vdm(object):
             lista.sort()
             valores_att.append(lista)
 
-        dist = distancias()
+        v = value_difference_metric()
+        v.config(self.dataset, self.cla_dataset)
         matriz_ext = []
 
         for i in range(len(valores_att)):
@@ -74,7 +70,7 @@ class vdm(object):
                 linha = []
                 for k in range(len(valores_att[i])):
                     if k >= j:
-                        vdm = round(dist.vdm(self.dataset, self.cla_dataset, valores_att[i][j], valores_att[i][k],i,self.q),4)                            
+                        vdm = round(v.calculate(valores_att[i][j], valores_att[i][k],i,self.q),4)                            
                         linha.append(((valores_att[i][j], valores_att[i][k]),vdm))
                     else:
                         linha.append(((valores_att[i][j], valores_att[i][k]),'na'))

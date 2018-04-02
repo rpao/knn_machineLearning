@@ -1,7 +1,7 @@
 from vdm import vdm
 from euclidiana import euclidiana
 class hvdm(object):
-    def config(self, conjunto_treino, classe_treino, peso = False, q = 1):
+    def config(self, conjunto_treino, classe_treino, q = 1, peso = False):
         self.conjunto_treino = conjunto_treino
         self.classe_treino = classe_treino
         self.peso = peso

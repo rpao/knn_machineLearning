@@ -27,6 +27,11 @@ class k_nn(object):
             self.VDM = vdm()
             self.VDM.config(self.conjunto_treino, self.classe_treino, self.q, self.peso)
 
+        if d == distancia_hvdm:
+            self.q = vdm_q
+            self.HVDM = hvdm()
+            self.HVDM.config(self.conjunto_treino, self.classe_treino, self.q, self.peso)
+
     def por_euclidiana(self):
         Euclidiana = euclidiana()
         

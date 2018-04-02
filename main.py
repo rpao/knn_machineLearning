@@ -1,73 +1,40 @@
 import time
-import matplotlib.pyplot as plt
 
-from lib_relatorio import lib_relatorio
 from arquivo import arquivo
 from k_nn import k_nn
 
 tempo_treinamento = 0
-tempo_classificacao = []
 
-def plot_grafico (taxa_acertos, k, titulo):
-    plt.figure(0)
-    plt.plot(k, taxa_acertos, k, taxa_acertos, 'g^')
-    plt.xlabel('valor de K')
-    plt.ylabel('Acuracia')
-    plt.title(titulo)
-    plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
-    plt.grid(True)
-    plt.show()
+def calcular_accuracia(predicao, cla_teste):
+    acerto = 0
+    
+    ## calcula a taxa de acertos 
+    for i in range(len(predicoes)):
+        if predicao[i] == cla_teste[i]: acerto += 1
 
-def calcular_accuracia(predicoes, cla_teste):
-    ## acuracia de todos os testes realizados
-    accuracias = []
+    ## calcula a acuracia
+    accuracia = acerto/float(len(cla_teste))
 
-    ## para cada k: taxas para seu conjunto de predicoes 
-    for predicao in predicoes:
-        acerto = 0
+    return accuracia
 
-        ## calcula a quantidade de acertos
-        for i in range(len(predicao)):
-            if predicao[i] == cla_teste[i]: acerto += 1
-
-        ## calcula a acuracia
-        accuracia = acerto/float(len(cla_teste))
-        
-        accuracias.append(accuracia)
-
-    return accuracias
-
-def calcula_knn(conjunto_treino, classe_treino, conjunto_teste, lista_k = [1], distancia='Euclidiana', q=1, pesos=False):    
+def calcula_knn(conjunto_treino, classe_treino, conjunto_teste, lista_k = 1, distancia='Euclidiana', q=1, pesos=False):    
     knn = k_nn()
-    
-    tempo_treino = time.clock()
-    
     knn.config(conjunto_treino, classe_treino, pesos, distancia, q)
+
+    start_time = time.clock()
     
-    tempo_treinamento = time.clock() - tempo_treino
-    
-    ## vetor que guarda todas as predicoes realizadas na execucao
-    predicoes = []
-    
-    for k in lista_k:
-        start_time = time.clock()
-        
-        ## vetor que guarda todas as predicoes realizadas para k
-        predicao = []
+    ## vetor que guarda todas as predicoes realizadas para k
+    predicao = []
 
-        ## obtem classe para cada instancia do conjunto de teste
-        for entrada in conjunto_teste:
-            classe_escolhida = knn.classificar(entrada, int(k))
-            predicao.append(classe_escolhida)
+    ## obtem classe para cada instancia do conjunto de teste
+    for entrada in conjunto_teste:
+        classe_escolhida = knn.classificar(entrada, k)
+        predicao.append(classe_escolhida)
 
-        ## armazena no vetor de predicoes total
-        predicoes.append(predicao)
+    ## tempo de execucao do knn
+    tempo_predicao = time.clock() - start_time
 
-        ## tempo de execucao do knn
-        tempo_predicao = time.clock() - start_time
-        tempo_classificacao.append(tempo_predicao)
-
-    return predicoes          
+    return predicao, tempo_predicao        
 
 modo_algoritmo = ['k-NN','k-NN ponderado']
 modo_distancia = ['euclidiana', 'hvdm', 'vdm']
@@ -77,102 +44,134 @@ r_exit = True
 while(r_exit):
     nome_arquivo = raw_input("Informe o caminho do arquivo:  ")
     
-    qtd_testes = int(raw_input("quantidade de testes:  "))
-
-    save_r = raw_input("Salvar relatorio(s) S/N?  ").upper()
-
-    plot_r = raw_input("Gerar grafico(s) S/N?  ").upper()
-
-    ## obtem valor(es) para k
-    lista_k = raw_input("\nInforme quantidade de vizinhos\n!! Se mais de um, siga o exemplo: 1,2,3,... ou 1 2 3 ...\n>> ").replace(" ",",").split(",")
-
+    ## obtem numero de repeticoes
     while(True):
         try:
-            k_fold = int(raw_input('\nInforme quantidade de conjuntos para o k-fold'))
+            qtd_testes = int(raw_input("quantidade de testes:  "))
             break        
-        except: print ('\nOpcao invalida\n')
-        
-    while(True):
-        try:
-            select_algoritmo = int(raw_input('\nModo do k-nn:\n[1] k-NN\n[2] k-NN ponderado\n>>'))-1
-            if select_algoritmo in [0,1] == False:
-                raise NameError('Opcao invalida')
+        except ValueError: print ('\nOpcao invalida\n')
 
-            break
-        
-        except: print ('\nOpcao invalida\n')
-        
-    while(True):
-        try:
-            select_distancia = int(raw_input('\nDistancia:\n[1] Euclidiana\n[2] HVDM\n[3] VDM\n>>'))-1
-            if select_distancia in [0,1,2] == False:
-                raise NameError('Opcao invalida')
-
-            q = 1
-
-            if select_distancia == 2 or select_distancia == 3:
-                q = raw_input('\nValor de q (se 1, aperte Enter)\n>> ')
-                if q == '': q = 1
-                else: q = int(q)
-
-            break
-        
-        except: print ('\nOpcao invalida\n')
+    ## obtem valor para kn
+    lista_k = raw_input("Informe quantidade de vizinhos (se mais de um, siga o exemplo: 1 2 3..): ").split(' ')
     
-    for teste_atual in range(qtd_testes):
-        ## abrir arquivo e acessar dados
-        a = arquivo()
-        a.abrir(nome_arquivo)
-
-        atributos, classes = a.get_dataset(k_fold)
-
-        for n_conj in range(len(atributos)):
-            conjunto_teste = atributos[0]
-            classe_teste = classes[0]
-            
-            atributos.remove(conjunto_teste)
-            classes.remove(classe_teste)
-
-            conjunto_treino = []
-            for i in range(len(atributos)):
-                for j in range(len(atributos[i])):
-                    conjunto_treino.append(atributos[i][j])
-
-            classe_treino = []
-            for i in range(len(classes)):
-                for j in range(len(classes[i])):
-                    classe_treino.append(classes[i][j])
+    ## obtem valor para kf
+    lista_kf = raw_input('Informe quantidade de conjuntos para o k-fold (valor minimo eh 2; se mais de um, siga o exemplo: 2 3 4..: ').split(' ')
+    
+    ## selecao do algoritmo de classificacao
+    while(True):
+        try:
+            select_algoritmo = int(raw_input('Modo do k-nn:\n[1] k-NN\n[2] k-NN ponderado\n>>'))-1
+            if select_algoritmo in [0,1] == False:
+                raise ValueError
+            break
         
-            ## knn
-            if select_algoritmo == 0:
-                predicoes = calcula_knn(conjunto_treino, classe_treino, conjunto_teste, lista_k, modo_distancia[select_distancia], q)
-                taxa_acerto = calcular_accuracia(predicoes, classe_teste)
+        except ValueError: print ('\nOpcao invalida\n')            
 
-            ## knn ponderado
-            elif select_algoritmo == 1:
-                predicoes = calcula_knn(conjunto_treino, classe_treino, conjunto_teste, lista_k, modo_distancia[select_distancia], q,True)
-                taxa_acerto = calcular_accuracia(predicoes, classe_teste)
+    ## selecao da metrica de distancia
+    while(True):
+        try:
+            select_distancia = int(raw_input('Distancia:\n[1] Euclidiana\n[2] HVDM\n[3] VDM\n>>'))-1
+            if select_distancia in [0,1,2] == False:
+                raise ValueError
+            if select_distancia == 1 or select_distancia == 2:
+                q = int(raw_input('Valor de q\n>> '))
+            break
+        
+        except ValueError: print ('\nOpcao invalida\n')
 
-            ## relatorio
-            relatorio = lib_relatorio()
-            relatorio.set_arquivo(nome_arquivo,n_conj)
-            relatorio.set_k(lista_k)
-            relatorio.set_tamanho_conjunto(len(conjunto_treino),len(conjunto_teste))
-            relatorio.set_modo(modo_algoritmo[select_algoritmo])
-            relatorio.set_distancia(modo_distancia[select_distancia])
-            relatorio.set_tempo(tempo_treinamento, tempo_classificacao)
-            relatorio.set_taxa_acerto(taxa_acerto)
-            relatorio.print_tela()
-            if save_r == 'S':
-                nome_relatorio = "relatorio_"+nome_arquivo.replace('.','_').replace('\\','_')+"_"+modo_algoritmo[select_algoritmo]+"_"+modo_distancia[select_distancia]+"_"+str(teste_atual)+".txt"
-                relatorio.save(nome_relatorio)
+    for kf in range(len(lista_kf)):
+        
+        k_fold = int(lista_kf[kf])
+        
+        for kn in range(len(lista_k)):
 
-            ## grafico
-            if plot_r == 'S': plot_grafico (taxa_acerto, lista_k, 'Taxa de Acerto - k-NN')
+            k = int(lista_k[kn])
+
+            resultado_taxas = []
+            tempo_execucao = []
+            
+            for teste_atual in range(qtd_testes):
+                ## abrir arquivo e acessar dados
+                a = arquivo()
+                a.abrir(nome_arquivo)
+
+                atributos, classes = a.get_dataset(k_fold)
                 
-            tempo_classificacao = []
-            atributos.append(conjunto_teste)
-            classes.append(classe_teste)
+                taxas_acertos = []
+                tempo_conjunto = []
+                for n_conj in range(len(atributos)):
+                    conjunto_teste = atributos[0]
+                    classe_teste = classes[0]
+                    
+                    atributos.remove(conjunto_teste)
+                    classes.remove(classe_teste)
+
+                    conjunto_treino = []
+                    for i in range(len(atributos)):
+                        for j in range(len(atributos[i])):
+                            conjunto_treino.append(atributos[i][j])
+
+                    classe_treino = []
+                    for i in range(len(classes)):
+                        for j in range(len(classes[i])):
+                            classe_treino.append(classes[i][j])
+                
+                    ## knn
+                    if select_algoritmo == 0:
+                        predicoes, tempo = calcula_knn(conjunto_treino, classe_treino, conjunto_teste, k, modo_distancia[select_distancia], q)
+                        taxa_acerto = calcular_accuracia(predicoes, classe_teste)
+
+                    ## knn ponderado
+                    elif select_algoritmo == 1:
+                        predicoes,tempo = calcula_knn(conjunto_treino, classe_treino, conjunto_teste, lista_k, modo_distancia[select_distancia], q,True)
+                        taxa_acerto = calcular_accuracia(predicoes, classe_teste)
+
+                    taxas_acertos.append(taxa_acerto)
+                    tempo_conjunto.append(tempo)
+                    
+                    atributos.append(conjunto_teste)
+                    classes.append(classe_teste)
+
+                resultado_taxas.append(taxas_acertos)
+                tempo_execucao.append(tempo_conjunto)
+                
+            medias_conjunto = []
+            for i in range(len(resultado_taxas)):
+                m = 0
+                qtd = len(resultado_taxas[i])
+                for j in range(len(resultado_taxas[i])):
+                    m  += resultado_taxas[i][j]
+                    
+                m = m/qtd
+                medias_conjunto.append(m)
+
+            media_total = 0
+            for media in medias_conjunto:
+                media_total += media
+
+            qtd = len(medias_conjunto)
+            media_total = media_total/qtd
+
+            media_tempo = []
+            for i in range(len(tempo_execucao)):
+                m = 0
+                qtd = len(tempo_execucao[i])
+                for j in range(len(tempo_execucao[i])):
+                    m += tempo_execucao[i][j]
+                media_tempo.append(m)
+
+            media_t_total = 0
+            for m in media_tempo:
+                media_t_total += m
+
+            media_t_total = media_t_total/len(media_tempo)
+            
+##            print ('Numero de vizinhos (Kn): '+str(k))
+##            print ('Numero de conjuntos (Kf): '+str(k_fold))
+##            print ('Taxa de acerto media\t|\tTempo medio de execucao')
+            print (str(round(media_total,3))+'\t|\t'+str(round(media_t_total,3))+' s')
+
+        print('__________________________________________________________')
 
     resp = raw_input("Encerrar S/N? ").upper()
     r_exit = 'S' != resp
