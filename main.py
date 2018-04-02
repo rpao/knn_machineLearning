@@ -166,9 +166,9 @@ while(r_exit):
 
             media_t_total = media_t_total/len(media_tempo)
             
-##            print ('Numero de vizinhos (Kn): '+str(k))
-##            print ('Numero de conjuntos (Kf): '+str(k_fold))
-##            print ('Taxa de acerto media\t|\tTempo medio de execucao')
+            print ('Numero de vizinhos (Kn): '+str(k))
+            print ('Numero de conjuntos (Kf): '+str(k_fold))
+            print ('Taxa de acerto media\t|\tTempo medio de execucao')
             print (str(round(media_total,3))+'\t|\t'+str(round(media_t_total,3))+' s')
 
         print('__________________________________________________________')
