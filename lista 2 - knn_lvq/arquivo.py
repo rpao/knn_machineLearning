@@ -25,13 +25,26 @@ class arquivo(object):
                 inst = random.choice(self.dataset_original)
                 self.dataset.append(inst)
                 self.dataset_original.remove(inst)
-
+        
         self.coluna_alvo = len(self.dataset[0])-1
 
-        return self.get_dataset()
-
     ## obtem os k conjuntos
-    def get_dataset (self):       
+    def get_dataset (self):
+        elementos = []
+
+        ## Separacao de atributos e coluna alvo
+        for line in self.dataset:
+            values = []
+            for i in range(len(line)):
+                try: values.append(float(line[i]))
+                except ValueError:
+                    if line[i] == '?': values.append(None)
+                    else: values.append(line[i])
+            elementos.append(values)
+            
+        return elementos
+    
+    def get_att_classe(self):
         atributos = []
         classes = []
 
@@ -41,7 +54,9 @@ class arquivo(object):
             for i in range(len(line)):
                 if i != self.coluna_alvo:
                     try: values.append(float(line[i]))
-                    except ValueError:values.append(line[i])
+                    except ValueError:
+                        if line[i] == '?': values.append(None)
+                        else: values.append(line[i])
             atributos.append(values)
             classes.append(line[self.coluna_alvo])
 

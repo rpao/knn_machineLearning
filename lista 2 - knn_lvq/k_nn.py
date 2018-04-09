@@ -14,7 +14,8 @@ class k_nn(object):
     def euclidiana(self, instancia1, instancia2):
         distancia = 0
         for i in range(len(instancia1)):
-            distancia += pow((instancia1[i]-instancia2[i]),2)
+            if instancia1[i] == None or instancia2[i] == None: distancia += 0
+            else: distancia += pow((float(instancia1[i])-float(instancia2[i])),2)
         return math.sqrt(distancia)
 
     ## calcula a distancia entre a entrada e todos os elementos do conjunto de treinamento
