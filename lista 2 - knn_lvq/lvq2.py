@@ -3,7 +3,9 @@ import random
 import operator
 import numpy as np
 
-class lvq1(object):
+from lvq1 import lvq1
+
+class lvq2(object):
     """
     Atributos:
         database: base de dados utilizada para construir o conjunto de prototipos
@@ -11,7 +13,7 @@ class lvq1(object):
     """
     def config(self, database, qtd_prototipos = 2, a = 0.01):
         if len(database) == 0: raise IndexError
-        
+                      
         db = np.array(database)
         self.classes = list({x for x in set(db.transpose()[len(database[0])-1])})
 
@@ -23,15 +25,17 @@ class lvq1(object):
 
         self.a = a
 
-        if self.qtd_prototipos < 2 or self.qtd_prototipos > len(database): raise ValueError
+        if qtd_prototipos < 2 or self.qtd_prototipos > len(database): raise ValueError
         
         for c in self.database:
             if self.qtdP_classe > len(c):
                 raise ValueError
 
-        self.conjunto_prototipos = self.definir_prototipos(self.database)
+        lvq = lvq1()
+        lvq.config(database, self.qtd_prototipos, self.a)
+        self.conjunto_prototipos = lvq.get_prototipos()
         self.treinar_prototipos()
-        
+
     def get_prototipos_att_classe(self):
         prot_att = []
         prot_classe = []
@@ -44,7 +48,7 @@ class lvq1(object):
             prot_att.append(vetor)
             
         return prot_att, prot_classe
-        
+    
     def get_prototipos(self):
         return self.conjunto_prototipos
 
@@ -59,17 +63,6 @@ class lvq1(object):
 
         return db   
 
-    def definir_prototipos(self, database):
-        conjunto_prototipos = []        
-
-        for subconjunto in database:
-            for i in range(self.qtdP_classe):
-                inst = random.choice(subconjunto)
-                conjunto_prototipos.append(inst)
-                subconjunto.remove(inst)
-            
-        return conjunto_prototipos
-
     ## calcula a distancia euclidiana
     def euclidiana(self, instancia1, instancia2):
         distancia = 0
@@ -78,7 +71,7 @@ class lvq1(object):
             else: distancia += pow((float(instancia1[i])-float(instancia2[i])),2)
         return math.sqrt(distancia)
     
-    def treinar_prototipos(self):
+    def treinar_prototipos(self):           
         for conjunto in self.database:
             for i in range(len(conjunto)):
                 lista_prototipos = []
@@ -90,15 +83,19 @@ class lvq1(object):
                 ## ordena de acordo com a distancia
                 lista_prototipos.sort(key = operator.itemgetter(0))
 
-                prototipo = lista_prototipos[0][1]
+                prototipo1 = lista_prototipos[0][1]
+                prototipo2 = lista_prototipos[1][1]
 
-                classePrototipo = prototipo[len(prototipo)-1]
+                classe1 = prototipo1[len(prototipo1)-1]
+                classe2 = prototipo2[len(prototipo2)-1]
                 classeElemento = conjunto[i][len(conjunto[i])-1]
 
-                if classePrototipo == classeElemento:
+                if classe1 == classeElemento and classe2 != classeElemento:
                     for k in range(len(conjunto[i])-1):
-                        prototipo[k] = prototipo[k] + self.a*(conjunto[i][k] - prototipo[k])
+                        prototipo1[k] = prototipo1[k] + self.a*(conjunto[i][k] - prototipo1[k])
+                        prototipo2[k] = prototipo2[k] - self.a*(conjunto[i][k] - prototipo2[k])
 
-                else:
+                elif classe1 != classeElemento and classe2 == classeElemento:
                     for k in range(len(conjunto[i])-1):
-                        prototipo[k] = prototipo[k] - self.a*(conjunto[i][k] - prototipo[k])
+                        prototipo1[k] = prototipo1[k] - self.a*(conjunto[i][k] - prototipo1[k])
+                        prototipo2[k] = prototipo2[k] + self.a*(conjunto[i][k] - prototipo2[k])

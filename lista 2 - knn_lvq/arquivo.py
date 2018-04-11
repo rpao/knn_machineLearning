@@ -28,6 +28,8 @@ class arquivo(object):
         
         self.coluna_alvo = len(self.dataset[0])-1
 
+        return self.get_att_classe()
+
     ## obtem os k conjuntos
     def get_dataset (self):
         elementos = []
