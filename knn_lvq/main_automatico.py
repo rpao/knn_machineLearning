@@ -80,44 +80,38 @@ def calcular_acerto(classficacao, coluna_alvo):
 
 arquivo = arquivo()
 
-str_menu_lvq = 'Selecione o algoritmo:\n1 - LVQ1\n2 - LVQ2.1\n3 - LVQ3\n4 - Sem Selecao de Prototipos'
+lista_kf = [10]
+lista_kn = [1,3]
+qtd_testes = 100
 
-p = 0
-
-sair = False
-
-while(sair == False):
-    erro_arquivo = True
-    while erro_arquivo:
-        database = raw_input('Caminho completo do arquivo:  ')
-        try:
-            atributos, coluna_alvo = arquivo.abrir(database)
-            erro_arquivo = False
-        except IOError as e:
-            print(" [Erro "+str(e.args[0])+"] "+str(e.args[1]))
-
+a = 0.001
+e = 0.05
+    
+for arq in ['data\kc2.csv','data\pc1.csv']:
+    atributos, coluna_alvo = arquivo.abrir(arq)
     qtd_instancias = float(len(coluna_alvo))
-    lista_kf = ler_lista_inteiro('\nk para o k-fold',2)
-    lista_kn = ler_lista_inteiro('\nk para o k-NN',1)
-    qtd_testes = ler_inteiro('\nQuantidade de testes ',1)
-
-    print (str_menu_lvq)
-    mode_LVQ = ler_inteiro("", 1, 4)
-            
-    if mode_LVQ != 4:
-        p = ler_inteiro('\nQuantidade de prototipos ',2)
+    if arq == 'data\kc2.csv': p = 100
+    else: p = 50
         
-        a = ler_float('\nTaxa de aprendizagem ',0)
-        
-        if mode_LVQ == 3: e = ler_float('\nConstante epsilon ',0,1)
-        else: e = 0
+    for mode_LVQ in [1, 2, 3]:
+        print '\n*****************************************************************\n'
+        print 'Arquivo: ',arq
+        print 'LVQ: ',mode_LVQ
+        print 'Quantidade de testes: ', qtd_testes
+        print 'Quantidade de instancias: ', qtd_instancias
+        print 'Quantidade de Prototipos: ', p, '\n'
+        print 'Taxa de aprendizagem: ', a
+        print 'Epsilon: ',e
 
-    try:
         tempo_total = time.clock()
         
         for kf in lista_kf:
+            
+            print 'kf: ',kf
+            
             for kn in lista_kn:
-                print('k-Fold: '+repr(kf)+'\t k-NN: '+repr(kn))
+                
+                print 'kn: ', kn
                 
                 for teste_atual in range(qtd_testes):
                     
@@ -176,17 +170,6 @@ while(sair == False):
                     tempo_teste_atual = time.clock () - tempo_teste_atual
                     
                     print (repr(teste_atual)+','+repr(round(taxa_acertos,4))+','+repr(round(tempo_medio,3)))
-                    ##print ('['+repr(teste_atual)+']\tTaxa de acerto: '+repr(round(taxa_acertos,4))+'\n\tTempo Medio de Execucao Por Instancia do Conjunto de Teste: '+repr(round(tempo_medio,3))+' segundos')
-                    ##print ('Tempo de Selecao de prototipos: '+repr(tempo_LVQ)+' segundos.')                  
-                    ##print('Tempo medio por instancia: '+repr(tempo_medio)+' segundos.')
-                    ##print ('Tempo do teste atual: '+repr(tempo_teste_atual)+' segundos.')
                     
         tempo_total = time.clock() - tempo_total
-        print ('Tempo total: '+repr(tempo_total)+' segundos.')
-        
-    except IOError as e:
-        print(" [Erro "+str(e.args[0])+"] "+str(e.args[1]))
-
-    continuar = raw_input('Encerrar S/N?  ').upper()
-    if continuar == 'S': sair = True
-    else: sair = False
+        print ('\nTempo total: '+repr(tempo_total)+' segundos.')
