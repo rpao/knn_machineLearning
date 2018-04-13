@@ -117,7 +117,12 @@ while(sair == False):
         
         for kf in lista_kf:
             for kn in lista_kn:
-                print('k-Fold: '+repr(kf)+'\t k-NN: '+repr(kn))
+                print ('\n**********************************************************\n')
+                print ('k-Fold: '+repr(kf)+'\t k-NN: '+repr(kn))
+                
+                tempo_teste = 0
+                mediaAcerto = 0
+                mediaTClass = 0
                 
                 for teste_atual in range(qtd_testes):
                     
@@ -159,7 +164,7 @@ while(sair == False):
                             X_test, y_test = atributos[indice_teste], coluna_alvo[indice_teste]
 
                             tempo_LVQ = time.clock() - tempo_LVQ
-
+                       
                         knn.config(X_train, y_train)
                         
                         start_time = time.clock()
@@ -174,14 +179,21 @@ while(sair == False):
                     taxa_acertos = acertos/qtd_instancias
                     tempo_medio = tempo_medio/qtd_instancias
                     tempo_teste_atual = time.clock () - tempo_teste_atual
+
+                    mediaAcerto += taxa_acertos
+                    mediaTClass += tempo_medio
+                    tempo_teste += tempo_teste_atual
                     
-                    print (repr(teste_atual)+','+repr(round(taxa_acertos,4))+','+repr(round(tempo_medio,3)))
-                    ##print ('['+repr(teste_atual)+']\tTaxa de acerto: '+repr(round(taxa_acertos,4))+'\n\tTempo Medio de Execucao Por Instancia do Conjunto de Teste: '+repr(round(tempo_medio,3))+' segundos')
-                    ##print ('Tempo de Selecao de prototipos: '+repr(tempo_LVQ)+' segundos.')                  
-                    ##print('Tempo medio por instancia: '+repr(tempo_medio)+' segundos.')
-                    ##print ('Tempo do teste atual: '+repr(tempo_teste_atual)+' segundos.')
-                    
-        tempo_total = time.clock() - tempo_total
+                mediaAcerto = mediaAcerto/qtd_testes
+                mediaTClass = mediaTClass/qtd_testes
+                tempo_teste = tempo_teste/qtd_testes
+                
+                print ('Taxa de Acerto Media: '+repr(mediaAcerto))
+                print ('Tempo Medio de Classificao por Instancia: '+repr(mediaTClass)+' segundos. ')
+                print ('Tempo Medio por Teste: '+repr(tempo_teste)+' segundos. ')
+                
+    
+        tempo_total = time.clock() - tempo_total        
         print ('Tempo total: '+repr(tempo_total)+' segundos.')
         
     except IOError as e:

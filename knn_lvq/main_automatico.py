@@ -82,7 +82,7 @@ arquivo = arquivo()
 
 lista_kf = [10]
 lista_kn = [1,3]
-qtd_testes = 100
+qtd_testes = 20
 
 a = 0.001
 e = 0.05
@@ -153,6 +153,7 @@ for arq in ['data\kc2.csv','data\pc1.csv']:
                             X_test, y_test = atributos[indice_teste], coluna_alvo[indice_teste]
 
                             tempo_LVQ = time.clock() - tempo_LVQ
+        
 
                         knn.config(X_train, y_train)
                         
@@ -169,7 +170,8 @@ for arq in ['data\kc2.csv','data\pc1.csv']:
                     tempo_medio = tempo_medio/qtd_instancias
                     tempo_teste_atual = time.clock () - tempo_teste_atual
                     
-                    print (repr(teste_atual)+','+repr(round(taxa_acertos,4))+','+repr(round(tempo_medio,3)))
+                    #print ('[Teste '+repr(teste_atual)+']\tTaxa de Acerto: '+repr(round(taxa_acertos,4))+'\tTempo medio de classificacao'+repr(round(tempo_medio,3)))+'\nTempo de Selecao de Prototipos: '+repr(tempo_LVQ)+' segundos.')
+                    print (repr(round(taxa_acertos,4))+','+repr(round(tempo_medio,3))+','+repr(tempo_LVQ))
                     
         tempo_total = time.clock() - tempo_total
         print ('\nTempo total: '+repr(tempo_total)+' segundos.')
