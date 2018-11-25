@@ -1,6 +1,6 @@
-## UFPE - CIn
+﻿## UFPE - CIn
 ## Aprendizagem de Máquina
-## Rebeca Paula Alves de Oliveira [rpao]
+## Rebeca Paula Alves de Oliveira [rpao], Livisghton Kébler de Araújo [lksa] e Anne Kelly Silva Ribeiro [aksr3]
 ## Lista 1 - Resolução
 
 1 - Na pasta 'data' estão os arquivos referentes as bases de dados utilizadas, todos no formato .csv, que é o padrão lido
